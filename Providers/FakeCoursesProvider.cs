@@ -46,6 +46,14 @@ namespace ListaCursos.Providers
             });
 
         }
+
+        public Task<(bool isSuccess, int? Id)> AddAsync(Course course)
+        {
+            course.Id = repo.Max(c => c.Id) + 1;
+            repo.Add(course);
+            return Task.FromResult((true,(int?)course.Id));
+        }
+
         public Task<ICollection<Course>> GetAllAsync()
         {
             return Task.FromResult((ICollection<Course>)repo.ToList());
@@ -61,9 +69,9 @@ namespace ListaCursos.Providers
             return Task.FromResult((ICollection<Course>) repo.Where(c=>c.Name.ToLowerInvariant().Contains(search.ToLowerInvariant())).ToList());
         }
 
-        public Task<bool> UpdateAsync(int id, Course course)
+        public Task<bool> UpdateAsync(Course course)
         {
-            var courseToUpdate = repo.FirstOrDefault(c=>c.Id==id);
+            var courseToUpdate = repo.FirstOrDefault(c=>c.Id==course.Id);
             if (courseToUpdate != null)
             {
                 courseToUpdate.Name = course.Name;
